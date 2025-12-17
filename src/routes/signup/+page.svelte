@@ -9,6 +9,7 @@
   let error = '';
   let loading = false;
 
+  // Handles signup form submission with basic client-side validation
   const handleSubmit = async (e) => {
     e.preventDefault();
     error = '';
@@ -39,162 +40,125 @@
   <title>Sign Up - MovieFlix</title>
 </svelte:head>
 
-<div class="auth-container">
-  <div class="auth-form">
-    <h1>Create Account</h1>
-    
+<div class="flex items-center justify-center min-h-[80vh]">
+  <div
+    class="w-full max-w-md bg-white p-8 rounded-lg
+           shadow-lg"
+  >
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">
+      Create Account
+    </h1>
+
     {#if error}
-      <div class="error-message">{error}</div>
+      <div
+        class="mb-6 rounded bg-red-50 p-4
+               text-red-700 font-medium"
+      >
+        {error}
+      </div>
     {/if}
 
-    <form on:submit={handleSubmit}>
-      <div class="form-group">
-        <label for="username">Username:</label>
+    <form on:submit={handleSubmit} class="space-y-6">
+      <div>
+        <label
+          for="username"
+          class="block mb-2 font-semibold text-gray-700"
+        >
+          Username
+        </label>
         <input
           id="username"
           type="text"
           bind:value={username}
           required
           placeholder="Choose a username"
+          class="w-full rounded border border-gray-300
+                 px-3 py-2 text-base
+                 focus:outline-none focus:ring-2
+                 focus:ring-indigo-400"
         />
       </div>
 
-      <div class="form-group">
-        <label for="email">Email:</label>
+      <div>
+        <label
+          for="email"
+          class="block mb-2 font-semibold text-gray-700"
+        >
+          Email
+        </label>
         <input
           id="email"
           type="email"
           bind:value={email}
           required
           placeholder="your@email.com"
+          class="w-full rounded border border-gray-300
+                 px-3 py-2 text-base
+                 focus:outline-none focus:ring-2
+                 focus:ring-indigo-400"
         />
       </div>
 
-      <div class="form-group">
-        <label for="password">Password:</label>
+      <div>
+        <label
+          for="password"
+          class="block mb-2 font-semibold text-gray-700"
+        >
+          Password
+        </label>
         <input
           id="password"
           type="password"
           bind:value={password}
           required
           placeholder="At least 6 characters"
+          class="w-full rounded border border-gray-300
+                 px-3 py-2 text-base
+                 focus:outline-none focus:ring-2
+                 focus:ring-indigo-400"
         />
       </div>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password:</label>
+      <div>
+        <label
+          for="confirmPassword"
+          class="block mb-2 font-semibold text-gray-700"
+        >
+          Confirm Password
+        </label>
         <input
           id="confirmPassword"
           type="password"
           bind:value={confirmPassword}
           required
           placeholder="Confirm password"
+          class="w-full rounded border border-gray-300
+                 px-3 py-2 text-base
+                 focus:outline-none focus:ring-2
+                 focus:ring-indigo-400"
         />
       </div>
 
-      <button type="submit" disabled={loading} class="btn-submit">
+      <button
+        type="submit"
+        disabled={loading}
+        class="w-full rounded bg-indigo-500
+               py-2 font-semibold text-white
+               transition hover:bg-indigo-600
+               disabled:opacity-60 disabled:cursor-not-allowed"
+      >
         {loading ? 'Creating account...' : 'Sign Up'}
       </button>
     </form>
 
-    <p class="auth-link">
-      Already have an account? <a href="/login">Login</a>
+    <p class="mt-6 text-center text-gray-600">
+      Already have an account?
+      <a
+        href="/login"
+        class="ml-1 font-semibold text-indigo-500 hover:underline"
+      >
+        Login
+      </a>
     </p>
   </div>
 </div>
-
-<style>
-  .auth-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-  }
-
-  .auth-form {
-    background: white;
-    padding: 3rem 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .auth-form h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 2rem;
-  }
-
-  .error-message {
-    background: #ffebee;
-    color: #d32f2f;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-  }
-
-  input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-  }
-
-  .btn-submit {
-    width: 100%;
-    padding: 0.75rem;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  .btn-submit:hover:not(:disabled) {
-    background: #5568d3;
-  }
-
-  .btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .auth-link {
-    text-align: center;
-    margin-top: 1.5rem;
-    color: #666;
-  }
-
-  .auth-link a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .auth-link a:hover {
-    text-decoration: underline;
-  }
-</style>

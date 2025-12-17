@@ -6,6 +6,7 @@
   import WatchlistBtn from '$lib/components/WatchlistBtn.svelte';
   import { onMount } from 'svelte';
 
+  // Redirect unauthenticated users to login page
   onMount(() => {
     if (!$auth.isLoggedIn) {
       goto('/login');
@@ -17,26 +18,62 @@
   <title>My Watchlist - MovieFlix</title>
 </svelte:head>
 
-<div class="watchlist-page">
-  <h1>My Watchlist</h1>
+<div class="animate-fadeIn">
+  <h1 class="mb-8 text-3xl font-bold text-gray-800">
+    My Watchlist
+  </h1>
 
   {#if !$auth.isLoggedIn}
-    <div class="error">
-      Please <a href="/login">login</a> to view your watchlist.
-    </div>
-  {:else if $watchlist.length === 0}
-    <div class="empty">
-      <p>Your watchlist is empty.</p>
-      <a href="/" class="btn-explore">Explore Movies</a>
-    </div>
-  {:else}
-    <div class="watchlist-stats">
-      <p>You have <strong>{$watchlist.length}</strong> movie(s) in your watchlist</p>
+    <div
+      class="rounded-lg bg-red-50 p-6
+             text-center text-red-700"
+    >
+      Please
+      <a
+        href="/login"
+        class="font-semibold underline"
+      >
+        login
+      </a>
+      to view your watchlist.
     </div>
 
-    <div class="movies-grid">
+  {:else if $watchlist.length === 0}
+    <div
+      class="rounded-lg bg-white p-12
+             text-center shadow"
+    >
+      <p class="mb-8 text-lg text-gray-600">
+        Your watchlist is empty.
+      </p>
+
+      <a
+        href="/"
+        class="inline-block rounded
+               bg-indigo-500 px-8 py-3
+               font-semibold text-white
+               transition hover:bg-indigo-600"
+      >
+        Explore Movies
+      </a>
+    </div>
+
+  {:else}
+    <div
+      class="mb-8 rounded-lg
+             bg-blue-50 p-6
+             font-medium text-blue-700"
+    >
+      You have <strong>{$watchlist.length}</strong>
+      movie(s) in your watchlist
+    </div>
+
+    <div
+      class="grid gap-8
+             grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
+    >
       {#each $watchlist as movie (movie.id)}
-        <div class="movie-item">
+        <div class="flex flex-col gap-2">
           <MovieCard {movie} />
           <WatchlistBtn {movie} />
         </div>
@@ -46,90 +83,13 @@
 </div>
 
 <style>
-  .watchlist-page {
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  .watchlist-page h1 {
-    color: #333;
-    margin-bottom: 2rem;
-  }
-
-  .watchlist-stats {
-    background: #e3f2fd;
-    color: #1976d2;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    font-weight: 500;
-  }
-
-  .movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 2rem;
-  }
-
-  .movie-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .empty {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: white;
-    border-radius: 8px;
-  }
-
-  .empty p {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 2rem;
-  }
-
-  .btn-explore {
-    display: inline-block;
-    background: #667eea;
-    color: white;
-    padding: 0.75rem 2rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s;
-  }
-
-  .btn-explore:hover {
-    background: #5568d3;
-  }
-
-  .error {
-    background: #ffebee;
-    color: #d32f2f;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-  }
-
-  .error a {
-    color: #d32f2f;
-    font-weight: 600;
-  }
-
+  /* Tailwind animation helper */
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  @media (max-width: 768px) {
-    .movies-grid {
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1.5rem;
-    }
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in;
   }
 </style>

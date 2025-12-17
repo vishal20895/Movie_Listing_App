@@ -1,4 +1,6 @@
+// Centralized wrapper around localStorage to ensure safe JSON handling
 export const storage = {
+  // Reads and parses stored JSON value, returns null on failure
   get: (key) => {
     try {
       return JSON.parse(localStorage.getItem(key));
@@ -7,6 +9,7 @@ export const storage = {
     }
   },
 
+  // Serializes and stores value, returns success status
   set: (key, value) => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
@@ -16,6 +19,7 @@ export const storage = {
     }
   },
 
+  // Removes a single key from storage
   remove: (key) => {
     try {
       localStorage.removeItem(key);
@@ -25,6 +29,7 @@ export const storage = {
     }
   },
 
+  // Clears all stored data (used on logout or reset)
   clear: () => {
     try {
       localStorage.clear();

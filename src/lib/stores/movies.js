@@ -1,7 +1,8 @@
 import { writable, derived } from 'svelte/store';
 
+// Movies store is the single source of truth for movie data and filters
 function createMoviesStore() {
-  const { subscribe, set, update } = writable({
+  const { subscribe, update } = writable({
     movies: [],
     loading: false,
     error: null,
@@ -16,18 +17,22 @@ function createMoviesStore() {
   return {
     subscribe,
 
+    // Replaces movie list after API calls and clears loading state
     setMovies: (movies) => {
       update(state => ({ ...state, movies, loading: false }));
     },
 
+    // Controls global loading indicator during async operations
     setLoading: (loading) => {
       update(state => ({ ...state, loading }));
     },
 
+    // Stores error and ensures loading state is cleared
     setError: (error) => {
       update(state => ({ ...state, error, loading: false }));
     },
 
+    // Updates individual filter values without affecting others
     updateFilter: (key, value) => {
       update(state => ({
         ...state,
@@ -35,6 +40,7 @@ function createMoviesStore() {
       }));
     },
 
+    // Resets all filters back to initial defaults
     resetFilters: () => {
       update(state => ({
         ...state,
@@ -51,30 +57,39 @@ function createMoviesStore() {
 
 export const movies = createMoviesStore();
 
-// Derived store for filtered movies
-export const filteredMovies = derived(movies, $movies => {
+// Applies client-side filtering based on current filter state
+export const filteredMovies = derived(movies, ($movies) => {
   let filtered = $movies.movies;
 
+  // Text search is applied first to reduce dataset size early
   if ($movies.filters.searchQuery) {
     filtered = filtered.filter(m =>
-      m.title.toLowerCase().includes($movies.filters.searchQuery.toLowerCase())
+      m.title
+        .toLowerCase()
+        .includes($movies.filters.searchQuery.toLowerCase())
     );
   }
 
+  // Genre filter matches TMDB genre ids
   if ($movies.filters.genre) {
     filtered = filtered.filter(m =>
       m.genre_ids?.includes($movies.filters.genre)
     );
   }
 
+  // Year filter is derived from release date
   if ($movies.filters.year) {
     filtered = filtered.filter(m =>
-      new Date(m.release_date).getFullYear() === parseInt($movies.filters.year)
+      new Date(m.release_date).getFullYear() ===
+      parseInt($movies.filters.year)
     );
   }
 
+  // Rating filter acts as a minimum threshold
   if ($movies.filters.rating > 0) {
-    filtered = filtered.filter(m => m.vote_average >= $movies.filters.rating);
+    filtered = filtered.filter(
+      m => m.vote_average >= $movies.filters.rating
+    );
   }
 
   return filtered;

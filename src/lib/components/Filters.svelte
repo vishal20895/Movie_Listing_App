@@ -1,13 +1,15 @@
 <script>
-  import { movies } from '$lib/stores/movies';
   import { onMount } from 'svelte';
-   import { tmdb } from '$lib/services/tmbd';
+  import { movies } from '$lib/stores/movies';
+  import { tmdb } from '$lib/services/tmbd';
 
+  // Local state for filters
   let genres = [];
   let selectedGenre = '';
   let selectedYear = '';
   let selectedRating = 0;
 
+  // Fetch genres from TMDb on mount
   onMount(async () => {
     try {
       genres = await tmdb.getGenres();
@@ -16,21 +18,20 @@
     }
   });
 
-  const handleGenreChange = (e) => {
-    selectedGenre = e.target.value;
+  // Update store filters when UI changes
+  const handleGenreChange = () => {
     movies.updateFilter('genre', selectedGenre ? parseInt(selectedGenre) : null);
   };
 
-  const handleYearChange = (e) => {
-    selectedYear = e.target.value;
-    movies.updateFilter('year', selectedYear ? selectedYear : null);
+  const handleYearChange = () => {
+    movies.updateFilter('year', selectedYear ? parseInt(selectedYear) : null);
   };
 
-  const handleRatingChange = (e) => {
-    selectedRating = parseFloat(e.target.value);
+  const handleRatingChange = () => {
     movies.updateFilter('rating', selectedRating);
   };
 
+  // Reset all filters
   const resetFilters = () => {
     selectedGenre = '';
     selectedYear = '';
@@ -39,10 +40,18 @@
   };
 </script>
 
-<div class="filters">
-  <div class="filter-group">
-    <label for="genre">Genre:</label>
-    <select id="genre" value={selectedGenre} on:change={handleGenreChange}>
+<div
+  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-6 bg-gray-100 rounded-lg mb-8"
+>
+  <!-- Genre Filter -->
+  <div class="flex flex-col">
+    <label for="genre" class="font-semibold mb-2 text-gray-800">Genre</label>
+    <select
+      id="genre"
+      bind:value={selectedGenre}
+      on:change={handleGenreChange}
+      class="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+    >
       <option value="">All Genres</option>
       {#each genres as genre}
         <option value={genre.id}>{genre.name}</option>
@@ -50,82 +59,45 @@
     </select>
   </div>
 
-  <div class="filter-group">
-    <label for="year">Year:</label>
+  <!-- Year Filter -->
+  <div class="flex flex-col">
+    <label for="year" class="font-semibold mb-2 text-gray-800">Year</label>
     <input
       id="year"
       type="number"
       min="1900"
       max={new Date().getFullYear()}
-      value={selectedYear}
+      bind:value={selectedYear}
       on:change={handleYearChange}
       placeholder="Select year"
+      class="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
     />
   </div>
 
-  <div class="filter-group">
-    <label for="rating">Min Rating: {selectedRating.toFixed(1)}</label>
+  <!-- Rating Filter -->
+  <div class="flex flex-col">
+    <label for="rating" class="font-semibold mb-2 text-gray-800">
+      Min Rating: {selectedRating.toFixed(1)}
+    </label>
     <input
       id="rating"
       type="range"
       min="0"
       max="10"
       step="0.5"
-      value={selectedRating}
+      bind:value={selectedRating}
       on:change={handleRatingChange}
+      class="cursor-pointer"
     />
   </div>
 
-  <button on:click={resetFilters} class="btn-reset">Reset Filters</button>
+  <!-- Reset Button -->
+  <div class="flex items-end">
+    <button
+      on:click={resetFilters}
+      class="w-full bg-red-500 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+    >
+      Reset Filters
+    </button>
+  </div>
 </div>
-
-<style>
-  .filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    padding: 1.5rem;
-    background: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-  }
-
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-
-  select, input[type="number"], input[type="range"] {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-  }
-
-  select:focus, input[type="number"]:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-  }
-
-  .btn-reset {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-  }
-
-  .btn-reset:hover {
-    background: #ee5a52;
-  }
-</style>

@@ -1,7 +1,6 @@
 <script>
   import { onMount } from 'svelte';
   import { movies, filteredMovies } from '$lib/stores/movies';
-//   import { tmdb } from '$lib/services/tmdb';
   import { tmdb } from '$lib/services/tmbd';
   import SearchBar from '$lib/components/SearchBar.svelte';
   import Filters from '$lib/components/Filters.svelte';
@@ -11,6 +10,7 @@
   let loading = false;
   let error = null;
 
+  // Fetch popular movies on component mount
   onMount(async () => {
     try {
       loading = true;
@@ -29,21 +29,35 @@
   <title>MovieFlix - Discover Movies</title>
 </svelte:head>
 
-<div class="page">
-  <h1>Discover Movies</h1>
+<div class="animate-[fadeIn_0.3s_ease-in]">
+  <h1 class="text-3xl font-bold mb-6">Discover Movies</h1>
+  
   <SearchBar />
   <Filters />
 
+  <!-- Loading state -->
   {#if loading}
-    <div class="loading">Loading movies...</div>
+    <div class="text-center p-8 text-lg rounded-lg bg-blue-50 text-blue-700">
+      Loading movies...
+    </div>
+  
+  <!-- Error state -->
   {:else if error}
-    <div class="error">{error}</div>
+    <div class="text-center p-8 text-lg rounded-lg bg-red-50 text-red-700">
+      {error}
+    </div>
+  
+  <!-- Empty state - no movies found -->
   {:else if $filteredMovies.length === 0}
-    <div class="empty">No movies found. Try adjusting your filters.</div>
+    <div class="text-center p-8 text-lg rounded-lg bg-gray-100 text-gray-600">
+      No movies found. Try adjusting your filters.
+    </div>
+  
+  <!-- Movies grid -->
   {:else}
-    <div class="movies-grid">
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-8">
       {#each $filteredMovies as movie (movie.id)}
-        <div class="movie-item">
+        <div class="flex flex-col gap-2">
           <MovieCard {movie} />
           <WatchlistBtn {movie} />
         </div>
@@ -51,52 +65,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .page {
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  .movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 2rem;
-  }
-
-  .movie-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .loading, .error, .empty {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.1rem;
-    border-radius: 8px;
-  }
-
-  .loading {
-    background: #e3f2fd;
-    color: #1976d2;
-  }
-
-  .error {
-    background: #ffebee;
-    color: #d32f2f;
-  }
-
-  .empty {
-    background: #f5f5f5;
-    color: #666;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-</style>

@@ -1,10 +1,21 @@
+// API key is injected via environment variables to avoid hardcoding secrets
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+
+// Base TMDB API URL used by all endpoints
 const BASE_URL = 'https://api.themoviedb.org/3';
+
+// Base URL for serving movie images
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
+// Simple sanity check to confirm env configuration
 console.log('API Key loaded:', API_KEY ? 'Yes' : 'No');
 
-// Helper function for API requests
+/**
+ * Centralized API helper
+ * - Attaches API key automatically
+ * - Handles query params
+ * - Normalizes error handling
+ */
 async function apiCall(endpoint, params = {}) {
   const queryParams = new URLSearchParams({
     api_key: API_KEY,
@@ -12,28 +23,28 @@ async function apiCall(endpoint, params = {}) {
   });
 
   const url = `${BASE_URL}${endpoint}?${queryParams.toString()}`;
-  
   console.log('Fetching:', url);
 
   try {
     const response = await fetch(url);
-    
+
+    // TMDB returns useful error text even on failed responses
     if (!response.ok) {
       const errorData = await response.text();
       console.error('API Response:', errorData);
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
+    // Errors are logged here and rethrown for callers to handle
     console.error('TMDb API Error:', error);
     throw error;
   }
 }
 
 export const tmdb = {
-  // Get popular movies
+  // Fetches trending popular movies for landing/home page
   getPopularMovies: async (page = 1) => {
     try {
       const data = await apiCall('/movie/popular', { page });
@@ -44,7 +55,7 @@ export const tmdb = {
     }
   },
 
-  // Search movies
+  // Searches movies based on user input
   searchMovies: async (query, page = 1) => {
     try {
       const data = await apiCall('/search/movie', { query, page });
@@ -55,20 +66,19 @@ export const tmdb = {
     }
   },
 
-  // Get movie details with credits and videos
+  // Fetches full movie details along with credits and trailers
   getMovieDetails: async (id) => {
     try {
-      const data = await apiCall(`/movie/${id}`, {
+      return await apiCall(`/movie/${id}`, {
         append_to_response: 'credits,videos'
       });
-      return data;
     } catch (error) {
       console.error('getMovieDetails error:', error);
       return null;
     }
   },
 
-  // Get all genres
+  // Loads static genre reference data used for filtering
   getGenres: async () => {
     try {
       const data = await apiCall('/genre/movie/list');
@@ -79,7 +89,7 @@ export const tmdb = {
     }
   },
 
-  // Get movies by genre with filters
+  // Discovers movies by genre with popularity-based sorting
   getMoviesByGenre: async (genreId, page = 1) => {
     try {
       const data = await apiCall('/discover/movie', {
@@ -94,8 +104,8 @@ export const tmdb = {
     }
   },
 
-  // Get image URL for poster/backdrop
-  getImageUrl: (path, size = 'w500') => {
+  // Generates full image URL from TMDB image path
+  getImageUrl: (path) => {
     if (!path) return null;
     return `${IMAGE_BASE_URL}${path}`;
   }
